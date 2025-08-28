@@ -1,14 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  // Get configuration values
+  const port = configService.get<number>('app.port');
+  const apiPrefix = configService.get<string>('app.apiPrefix');
+  const nodeEnv = configService.get<string>('app.nodeEnv');
+  const enableRequestLogging = configService.get<boolean>('logging.enableRequestLogging');
 
   // Enable CORS for Flutter app integration
   app.enableCors({
-    origin: true, // Configure this based on your Flutter app's needs
+    origin: nodeEnv === 'production' ? false : true, // Configure based on environment
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -19,7 +27,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidNonWhitelisted: true,
-      disableErrorMessages: process.env.NODE_ENV === 'production',
+      disableErrorMessages: nodeEnv === 'production',
     }),
   );
 
@@ -29,13 +37,14 @@ async function bootstrap() {
   // Note: Global exception filter is configured in AppModule via APP_FILTER
 
   // Set global prefix for API routes
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix(apiPrefix);
 
-  const port = process.env.PORT || 3000;
   await app.listen(port);
 
-  console.log(`🚀 CVision API is running on: http://localhost:${port}/api`);
-  console.log(`📊 Health check available at: http://localhost:${port}/api/health`);
+  console.log(`🚀 CVision API is running on: http://localhost:${port}/${apiPrefix}`);
+  console.log(`📊 Health check available at: http://localhost:${port}/${apiPrefix}/health`);
+  console.log(`🌍 Environment: ${nodeEnv}`);
+  console.log(`📝 Request logging: ${enableRequestLogging ? 'enabled' : 'disabled'}`);
 }
 
 bootstrap();
