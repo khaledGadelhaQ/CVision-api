@@ -13,12 +13,14 @@ export class DatabaseKeepAliveService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit() {
-    // Only enable keep-alive in development to prevent cold starts
-    const isDevelopment = this.configService.get<string>('app.nodeEnv') === 'development';
+    // Keep-alive service temporarily disabled
+    // const isDevelopment = this.configService.get<string>('app.nodeEnv') === 'development';
     
-    if (isDevelopment) {
-      this.startKeepAlive();
-    }
+    // if (isDevelopment) {
+    //   this.startKeepAlive();
+    // }
+    
+    console.log('🔄 Database keep-alive service is disabled');
   }
 
   onModuleDestroy() {

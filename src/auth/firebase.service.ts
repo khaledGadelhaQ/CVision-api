@@ -1,8 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
-import * as path from 'path';
-import * as fs from 'fs';
 
 @Injectable()
 export class FirebaseService {
@@ -14,27 +12,14 @@ export class FirebaseService {
 
   private initializeFirebase() {
     try {
-      // Try to load from firebase.json file first
-      const firebaseConfigPath = path.join(process.cwd(), 'firebase.json');
-      
-      if (fs.existsSync(firebaseConfigPath)) {
-        console.log('🔥 Loading Firebase configuration from firebase.json');
-        
-        this.app = admin.initializeApp({
-          credential: admin.credential.cert(firebaseConfigPath),
-        });
-        
-        console.log('🔥 Firebase Admin initialized successfully from JSON file');
-        return;
-      }
-
-      // Fallback to environment variables
+      // Load Firebase configuration from environment variables
       const projectId = this.configService.get<string>('firebase.projectId');
       const clientEmail = this.configService.get<string>('firebase.clientEmail');
       const privateKey = this.configService.get<string>('firebase.privateKey');
 
       if (!projectId || !clientEmail || !privateKey) {
         console.warn('⚠️ Firebase configuration missing - authentication will not work');
+        console.warn('Required: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY');
         return;
       }
 
