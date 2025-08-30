@@ -14,7 +14,9 @@ export class HealthController {
   @Get()
   @Public()
   async checkHealth() {
+    const start = Date.now();
     const dbHealth = await this.prismaService.isHealthy();
+    const responseTime = Date.now() - start;
     
     return {
       status: 'ok',
@@ -24,6 +26,10 @@ export class HealthController {
       environment: this.configService.get<string>('app.nodeEnv'),
       version: '1.0.0',
       database: dbHealth ? 'connected' : 'disconnected',
+      performance: {
+        dbResponseTime: `${responseTime}ms`,
+        status: responseTime < 1000 ? 'good' : responseTime < 3000 ? 'slow' : 'critical',
+      },
     };
   }
 
@@ -83,5 +89,50 @@ export class HealthController {
     }
 
     return baseInfo;
+  }
+
+  @Get('performance')
+  @Public()
+  async checkPerformance() {
+    const results = {
+      timestamp: new Date().toISOString(),
+      tests: {},
+    };
+
+    // Test database ping multiple times
+    const dbPings = [];
+    for (let i = 0; i < 3; i++) {
+      const start = Date.now();
+      try {
+        await this.prismaService.$queryRaw`SELECT 1 as performance_test`;
+        const responseTime = Date.now() - start;
+        dbPings.push({ success: true, responseTime });
+      } catch (error) {
+        const responseTime = Date.now() - start;
+        dbPings.push({ success: false, responseTime });
+      }
+      
+      // Small delay between pings
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    results.tests = {
+      database: {
+        pings: dbPings,
+        average: Math.round(dbPings.reduce((sum, ping) => sum + ping.responseTime, 0) / dbPings.length),
+        min: Math.min(...dbPings.map(ping => ping.responseTime)),
+        max: Math.max(...dbPings.map(ping => ping.responseTime)),
+        allSuccessful: dbPings.every(ping => ping.success),
+      },
+      application: {
+        uptime: process.uptime(),
+        memoryUsage: {
+          heapUsed: Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 100) / 100,
+          heapTotal: Math.round((process.memoryUsage().heapTotal / 1024 / 1024) * 100) / 100,
+        },
+      },
+    };
+
+    return results;
   }
 }

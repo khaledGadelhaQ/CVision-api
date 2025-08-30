@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cvision-api
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+    # Environment variables from your dashboard:
+    # - DATABASE_URL (from your Prisma Postgres dashboard)
+    # - FIREBASE_PROJECT_ID
+    # - FIREBASE_CLIENT_EMAIL  
+    # - FIREBASE_PRIVATE_KEY

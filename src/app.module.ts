@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { CatchEverythingFilter } from '@/common/filters/catch-everything.filter';
 import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 import { FirebaseAuthGuard } from './auth/firebase-auth.guard';
+import { DatabaseKeepAliveService } from './common/services/database-keep-alive.service';
 import configuration from './config/configuration';
 
 @Module({
@@ -29,6 +30,7 @@ import configuration from './config/configuration';
   controllers: [],
   providers: [
     HttpAdapterHost,
+    DatabaseKeepAliveService,
     // Temporarily disable Firebase auth guard for production testing
     // {
     //   provide: APP_GUARD,
