@@ -98,7 +98,8 @@ All endpoints return consistent JSON structure:
 3. **Configure Firebase Authentication**:
    - Go to [Firebase Console](https://console.firebase.google.com)
    - Create a project → Project Settings → Service Accounts
-   - Generate new private key and add credentials to environment files
+   - Generate new private key and **save as `firebase.json` in project root**
+   - The app will automatically use `firebase.json` if present
 
 ### Environment Variables
 
@@ -110,10 +111,10 @@ PORT=3000
 # Database (Prisma Postgres)
 DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=YOUR_API_KEY"
 
-# Firebase Authentication
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@project.iam.gserviceaccount.com
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nKEY_CONTENT\n-----END PRIVATE KEY-----\n"
+# Firebase Authentication (OPTIONAL - uses firebase.json file if present)
+# FIREBASE_PROJECT_ID=your-project-id
+# FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@project.iam.gserviceaccount.com  
+# FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nKEY_CONTENT\n-----END PRIVATE KEY-----\n"
 
 # File Storage
 UPLOAD_PATH=./uploads
@@ -136,7 +137,7 @@ cp .env.example .env.production
 
 # 3. Configure your environment files with:
 #    - Prisma Postgres connection string
-#    - Firebase service account credentials
+#    - (Firebase credentials are loaded from firebase.json automatically)
 
 # 4. Push database schema to your database
 npx prisma db push

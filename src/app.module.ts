@@ -31,11 +31,11 @@ import configuration from './config/configuration';
   providers: [
     HttpAdapterHost,
     DatabaseKeepAliveService,
-    // Temporarily disable Firebase auth guard for production testing
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: FirebaseAuthGuard,
-    // },
+    // Firebase auth guard - now enabled with firebase.json
+    {
+      provide: APP_GUARD,
+      useClass: FirebaseAuthGuard,
+    },
     {
       provide: APP_FILTER,
       useClass: CatchEverythingFilter,

@@ -12,6 +12,11 @@ services:
         value: 3000
     # Environment variables from your dashboard:
     # - DATABASE_URL (from your Prisma Postgres dashboard)
+    #
+    # Firebase configuration (OPTIONAL):
+    # The app will try to use firebase.json file first.
+    # If firebase.json is not available (file uploads not supported on Render free tier),
+    # set these environment variables in Render dashboard:
     # - FIREBASE_PROJECT_ID
     # - FIREBASE_CLIENT_EMAIL  
     # - FIREBASE_PRIVATE_KEY

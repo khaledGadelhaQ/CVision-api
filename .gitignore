@@ -10,6 +10,9 @@ dist/
 .env.test
 .env.staging
 
+# Firebase service account key
+firebase.json
+
 # Exception: Allow environment template files
 !.env.example
 !.env.template
