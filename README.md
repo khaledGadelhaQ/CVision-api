@@ -5,7 +5,7 @@ A TypeScript-based REST API built with Nest.js for AI-powered career guidance ap
 ## Tech Stack
 
 - **Framework**: Nest.js with TypeScript
-- **Database**: PostgreSQL (Neon) with Prisma ORM  
+- **Database**: PostgreSQL (Prisma Postgres) with Prisma ORM  
 - **Authentication**: Firebase Auth (ID token validation)
 - **Deployment**: Render.com
 - **API Documentation**: Postman collection included
@@ -82,36 +82,81 @@ All endpoints return consistent JSON structure:
 
 ## Environment Configuration
 
-### Development
-```env
-NODE_ENV=development
-PORT=3000
-DATABASE_URL=postgresql://user:pass@neon-db/cvision_dev
-FIREBASE_PROJECT_ID=cvision-dev
-```
+### Setup Instructions
 
-### Production  
+1. **Copy the example environment file**:
+   ```bash
+   cp .env.example .env.development
+   cp .env.example .env.production
+   ```
+
+2. **Configure Database (Prisma Postgres)**:
+   - Sign up at [Prisma Console](https://console.prisma.io)
+   - Create a new PostgreSQL database
+   - Copy the connection string to your environment files
+
+3. **Configure Firebase Authentication**:
+   - Go to [Firebase Console](https://console.firebase.google.com)
+   - Create a project → Project Settings → Service Accounts
+   - Generate new private key and add credentials to environment files
+
+### Environment Variables
+
 ```env
-NODE_ENV=production
+# Application
+NODE_ENV=development|production
 PORT=3000
-DATABASE_URL=postgresql://user:pass@neon-db/cvision_prod
-FIREBASE_PROJECT_ID=cvision-prod
+
+# Database (Prisma Postgres)
+DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=YOUR_API_KEY"
+
+# Firebase Authentication
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@project.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nKEY_CONTENT\n-----END PRIVATE KEY-----\n"
+
+# File Storage
+UPLOAD_PATH=./uploads
+MAX_FILE_SIZE=10485760
+ALLOWED_FILE_TYPES=pdf,doc,docx
+
+# API Configuration
+API_PREFIX=api
 ```
 
 ## Installation & Setup
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Set up environment
-cp .env.development.example .env.development
-# Configure Firebase credentials
+# 2. Set up environment files
+cp .env.example .env.development
+cp .env.example .env.production
 
-# Run database migration
-npx prisma migrate dev --name init
+# 3. Configure your environment files with:
+#    - Prisma Postgres connection string
+#    - Firebase service account credentials
 
-# Start development server
+# 4. Push database schema to your database
+npx prisma db push
+
+# 5. Generate Prisma Client
+npx prisma generate
+
+# 6. Start development server
+npm run start:dev
+```
+
+### Production Deployment
+
+```bash
+# Build the application
+npm run build
+
+# Start production server
+npm run start:prod
+```
 npm run start:dev
 ```
 

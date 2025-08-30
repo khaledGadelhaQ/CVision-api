@@ -1,16 +1,17 @@
 node_modules/
 dist/
 *.log
+# Environment files - ALL should be ignored for security
 .env
+.env.*
 .env.local
-.env.production.local
-.env.development.local
-.DS_Store
-coverage/
-.nyc_output
+.env.development
+.env.production
+.env.test
+.env.staging
 
-# Keep template environment files, but ignore local overrides
-!.env.development
-!.env.production
+# Exception: Allow environment template files
+!.env.example
+!.env.template
 
 /generated/prisma
