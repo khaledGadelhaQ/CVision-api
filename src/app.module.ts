@@ -29,10 +29,11 @@ import configuration from './config/configuration';
   controllers: [],
   providers: [
     HttpAdapterHost,
-    {
-      provide: APP_GUARD,
-      useClass: FirebaseAuthGuard,
-    },
+    // Temporarily disable Firebase auth guard for production testing
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: FirebaseAuthGuard,
+    // },
     {
       provide: APP_FILTER,
       useClass: CatchEverythingFilter,
