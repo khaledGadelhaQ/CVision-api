@@ -1,0 +1,533 @@
+{
+  "info": {
+    "name": "CVision API",
+    "description": "AI-Powered Career Roadmap Application API\n\nThis collection contains all endpoints for the CVision application, organized by feature modules.\n\n**Authentication:**\n- Most endpoints require Firebase ID token in Authorization header\n- Public endpoints are marked clearly\n- Use Firebase Auth to get ID tokens\n\n**Environments:**\n- Development: Local development server\n- Production: Production deployment on Render",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "cvision-api-collection",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "description": "System health and status endpoints - no authentication required",
+      "item": [
+        {
+          "name": "Check API Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/{{api_prefix}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["{{api_prefix}}", "health"]
+            },
+            "description": "Check the overall health of the API including database connectivity and service status.\n\n**Public Endpoint** - No authentication required."
+          },
+          "response": [
+            {
+              "name": "Healthy Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/health",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "health"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"status\": \"ok\",\n    \"service\": \"CVision API\",\n    \"version\": \"1.0.0\",\n    \"environment\": \"development\",\n    \"database\": {\n      \"status\": \"connected\",\n      \"provider\": \"postgresql\"\n    },\n    \"uptime\": \"2h 30m 45s\",\n    \"timestamp\": \"2025-08-30T08:45:23.123Z\"\n  }\n}"
+            },
+            {
+              "name": "Database Connection Error",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/health",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "health"]
+                }
+              },
+              "status": "Service Unavailable",
+              "code": 503,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"message\": \"Database connection failed\",\n    \"code\": \"DATABASE_ERROR\",\n    \"statusCode\": 503\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "description": "User profile and account management endpoints",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebase_token}}",
+                "description": "Firebase ID Token"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/{{api_prefix}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["{{api_prefix}}", "users", "profile"]
+            },
+            "description": "Get the authenticated user's profile information including basic details, skills, and roadmaps.\n\n**Authentication Required** - Firebase ID token in Authorization header."
+          },
+          "response": [
+            {
+              "name": "Profile Retrieved Successfully",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmODhh..."
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/users/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "users", "profile"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"cm0k1x2y3z4a5b6c7d8e9f0g\",\n    \"firebaseUid\": \"firebase_user_123\",\n    \"email\": \"john.doe@example.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"profileImage\": \"/uploads/profileImages/user_123.jpg\",\n    \"university\": \"MIT\",\n    \"major\": \"Computer Science\",\n    \"careerGoals\": \"Become a senior full-stack developer\",\n    \"onboardingCompleted\": true,\n    \"createdAt\": \"2025-08-25T10:30:00.000Z\",\n    \"updatedAt\": \"2025-08-30T08:45:00.000Z\",\n    \"skills\": [\n      {\n        \"id\": \"skill_1\",\n        \"skillId\": \"javascript_skill\",\n        \"level\": \"INTERMEDIATE\",\n        \"isFromCV\": true,\n        \"skill\": {\n          \"id\": \"javascript_skill\",\n          \"name\": \"JavaScript\",\n          \"category\": \"Programming Languages\"\n        }\n      }\n    ],\n    \"roadmaps\": [\n      {\n        \"id\": \"roadmap_1\",\n        \"title\": \"Full-Stack Developer Path\",\n        \"targetRole\": \"Senior Full-Stack Developer\",\n        \"status\": \"ACTIVE\"\n      }\n    ],\n    \"_count\": {\n      \"cvs\": 2,\n      \"roadmaps\": 1,\n      \"skills\": 8\n    }\n  }\n}"
+            },
+            {
+              "name": "Unauthorized - Missing Token",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/users/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "users", "profile"]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"message\": \"Authorization header is required\",\n    \"code\": \"UNAUTHORIZED\",\n    \"statusCode\": 401\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebase_token}}",
+                "description": "Firebase ID Token"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"university\": \"Stanford University\",\n  \"major\": \"Computer Science\",\n  \"careerGoals\": \"Become a senior full-stack developer specializing in React and Node.js\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/{{api_prefix}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["{{api_prefix}}", "users", "profile"]
+            },
+            "description": "Update the authenticated user's profile information. All fields are optional - only provided fields will be updated.\n\n**Authentication Required** - Firebase ID token in Authorization header.\n\n**Request Body Fields:**\n- `firstName` (string, optional): User's first name\n- `lastName` (string, optional): User's last name\n- `university` (string, optional): University name\n- `major` (string, optional): Academic major/field of study\n- `careerGoals` (string, optional): Career objectives and goals\n- `profileImage` (string, optional): Path to profile image"
+          },
+          "response": [
+            {
+              "name": "Profile Updated Successfully",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmODhh..."
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"university\": \"Stanford University\",\n  \"major\": \"Computer Science\",\n  \"careerGoals\": \"Become a senior full-stack developer specializing in React and Node.js\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/users/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "users", "profile"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"cm0k1x2y3z4a5b6c7d8e9f0g\",\n    \"firebaseUid\": \"firebase_user_123\",\n    \"email\": \"john.doe@example.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Smith\",\n    \"profileImage\": \"/uploads/profileImages/user_123.jpg\",\n    \"university\": \"Stanford University\",\n    \"major\": \"Computer Science\",\n    \"careerGoals\": \"Become a senior full-stack developer specializing in React and Node.js\",\n    \"onboardingCompleted\": true,\n    \"createdAt\": \"2025-08-25T10:30:00.000Z\",\n    \"updatedAt\": \"2025-08-30T08:50:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmODhh..."
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": 123,\n  \"lastName\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/users/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "users", "profile"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"message\": \"Validation failed\",\n    \"code\": \"VALIDATION_ERROR\",\n    \"statusCode\": 400,\n    \"details\": [\n      {\n        \"field\": \"firstName\",\n        \"message\": \"firstName must be a string\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Onboarding Steps",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebase_token}}",
+                "description": "Firebase ID Token"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/{{api_prefix}}/users/onboarding",
+              "host": ["{{base_url}}"],
+              "path": ["{{api_prefix}}", "users", "onboarding"]
+            },
+            "description": "Check the completion status of onboarding steps for the authenticated user.\n\n**Authentication Required** - Firebase ID token in Authorization header.\n\n**Returns:**\n- Profile completion status (firstName, lastName)\n- Academic info completion (university, major)\n- Career goals status\n- CV upload status"
+          },
+          "response": [
+            {
+              "name": "Onboarding Status",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmODhh..."
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/users/onboarding",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "users", "onboarding"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"profileCompleted\": true,\n    \"academicInfoCompleted\": true,\n    \"careerGoalsSet\": true,\n    \"cvUploaded\": false\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Complete Onboarding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebase_token}}",
+                "description": "Firebase ID Token"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/{{api_prefix}}/users/onboarding/complete",
+              "host": ["{{base_url}}"],
+              "path": ["{{api_prefix}}", "users", "onboarding", "complete"]
+            },
+            "description": "Mark the onboarding process as completed for the authenticated user. This endpoint validates that all required onboarding steps are completed before marking as finished.\n\n**Authentication Required** - Firebase ID token in Authorization header.\n\n**Prerequisites:**\n- Profile information (firstName, lastName) must be set\n- Academic information (university, major) must be set\n- Career goals must be set\n- At least one CV must be uploaded"
+          },
+          "response": [
+            {
+              "name": "Onboarding Completed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmODhh..."
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/users/onboarding/complete",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "users", "onboarding", "complete"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"cm0k1x2y3z4a5b6c7d8e9f0g\",\n    \"onboardingCompleted\": true,\n    \"completedAt\": \"2025-08-30T08:55:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "Onboarding Incomplete",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmODhh..."
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/users/onboarding/complete",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "users", "onboarding", "complete"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"message\": \"Cannot complete onboarding - not all steps are finished\",\n    \"code\": \"ONBOARDING_INCOMPLETE\",\n    \"statusCode\": 400\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get User Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebase_token}}",
+                "description": "Firebase ID Token"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/{{api_prefix}}/users/stats",
+              "host": ["{{base_url}}"],
+              "path": ["{{api_prefix}}", "users", "stats"]
+            },
+            "description": "Get usage statistics and activity data for the authenticated user.\n\n**Authentication Required** - Firebase ID token in Authorization header.\n\n**Returns:**\n- Number of uploaded CVs\n- Number of skills tracked\n- Number of career roadmaps\n- Days since joining\n- Last activity timestamp"
+          },
+          "response": [
+            {
+              "name": "User Stats",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjFmODhh..."
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/{{api_prefix}}/users/stats",
+                  "host": ["{{base_url}}"],
+                  "path": ["{{api_prefix}}", "users", "stats"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"cvs\": 2,\n    \"skills\": 8,\n    \"roadmaps\": 1,\n    \"daysSinceJoining\": 5,\n    \"lastUpdated\": \"2025-08-30T08:45:00.000Z\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{firebase_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script for CVision API",
+          "// Add any global pre-request logic here",
+          "",
+          "// Example: Set request timestamp",
+          "pm.globals.set('request_timestamp', new Date().toISOString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script for CVision API",
+          "// Add common response validations here",
+          "",
+          "// Check response time",
+          "pm.test('Response time is less than 2000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "// Check for standard response structure",
+          "if (pm.response.code === 200) {",
+          "    pm.test('Response has success field', function () {",
+          "        pm.expect(pm.response.json()).to.have.property('success');",
+          "    });",
+          "",
+          "    pm.test('Response has data field when successful', function () {",
+          "        const jsonData = pm.response.json();",
+          "        if (jsonData.success === true) {",
+          "            pm.expect(jsonData).to.have.property('data');",
+          "        }",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "collection_version",
+      "value": "1.0.0",
+      "type": "string"
+    }
+  ]
+}

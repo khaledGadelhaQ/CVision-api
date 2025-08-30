@@ -1,113 +1,179 @@
 # CVision API
 
-A Nest.js API designed for AI model integration and Flutter app communication.
+A TypeScript-based REST API built with Nest.js for AI-powered career guidance application. Provides backend services for user management, CV processing, and career roadmap generation.
 
-## Features
+## Tech Stack
 
-- ✅ **Environment Configuration**: Separate dev/prod configurations using @nestjs/config
-- ✅ **Global Exception Handling**: Environment-aware error responses
-- ✅ **Global Validation**: Request validation with class-validator
-- ✅ **Consistent Response Format**: Standardized API responses for Flutter app integration
-- ✅ **Health Check Endpoints**: Environment-aware system health monitoring
-- ✅ **CORS Enabled**: Ready for Flutter app communication
-- ✅ **TypeScript**: Full TypeScript support with proper typing
+- **Framework**: Nest.js with TypeScript
+- **Database**: PostgreSQL (Neon) with Prisma ORM  
+- **Authentication**: Firebase Auth (ID token validation)
+- **Deployment**: Render.com
+- **API Documentation**: Postman collection included
 
-## Environment Configuration
+## Architecture
 
-The application uses different configuration files based on the environment:
+```
+src/
+├── auth/                    # Firebase authentication & guards
+├── users/                   # User profile management
+├── common/
+│   ├── decorators/          # Custom decorators (@Public, @CurrentUser)
+│   ├── filters/             # Global exception handling
+│   └── interceptors/        # Response transformation
+├── config/                  # Environment configuration
+├── prisma/                  # Database service
+└── health/                  # Health check endpoints
+```
 
-- **Development**: `.env.development`
-- **Production**: `.env.production`
-- **Fallback**: `.env`
+## Database Schema (MVP)
 
-### Environment Variables
+```sql
+User          # Basic profile, Firebase integration
+├── CV        # Document storage and processing
+├── UserSkill # Skill tracking with levels
+└── CareerRoadmap
+    └── RoadmapItem  # Roadmap steps and milestones
+```
 
-| Variable | Description | Dev Default | Prod Default |
-|----------|-------------|-------------|--------------|
-| `NODE_ENV` | Environment mode | `development` | `production` |
-| `PORT` | Server port | `3000` | `3000` |
-| `LOG_LEVEL` | Logging level | `debug` | `error` |
-| `ENABLE_REQUEST_LOGGING` | Request logging | `true` | `false` |
-| `JWT_SECRET` | JWT secret key | dev-secret | secure-prod-secret |
-| `AI_MODEL_API_URL` | AI service URL | localhost:8000 | prod-ai-url |
+## Authentication Flow
+
+1. **Client** → Firebase ID token in `Authorization: Bearer <token>`
+2. **API** → Validates token with Firebase Admin SDK
+3. **Database** → Creates/updates user record automatically
+4. **Request** → User data attached to request context via `@CurrentUser()` decorator
 
 ## API Endpoints
 
-### Health Check
-- `GET /api/health` - Basic health check
-- `GET /api/health/detailed` - Environment-aware detailed system information
+### Public Endpoints
+- `GET /api/health` - System health check
 
-### Test Endpoints (Development only)
-- `GET /api/test/error/400` - Bad Request error
-- `GET /api/test/error/404` - Not Found error  
-- `GET /api/test/error/500` - Internal Server error
-- `GET /api/test/error/custom` - Custom error with details
+### Protected Endpoints (Firebase Auth Required)
+- `GET /api/users/profile` - Get user profile with skills & roadmaps
+- `PUT /api/users/profile` - Update user profile  
+- `GET /api/users/onboarding` - Check onboarding completion status
+- `POST /api/users/onboarding/complete` - Mark onboarding as finished
+- `GET /api/users/stats` - User activity statistics
 
 ## Response Format
 
-All API responses follow this consistent format:
+All endpoints return consistent JSON structure:
 
 ### Success Response
 ```json
 {
-  "status": "success",
-  "statusCode": 200,
-  "message": "Request successful",
-  "data": {},
-  "timestamp": "2025-08-22T04:35:47.000Z",
-  "path": "/api/health"
+  "success": true,
+  "data": {
+    // Response payload
+  }
 }
 ```
 
-### Error Response (Development)
+### Error Response
 ```json
 {
-  "status": "error",
-  "statusCode": 500,
-  "message": "Detailed error message",
-  "stack": "Error stack trace...",
-  "details": {},
-  "environment": "development",
-  "requestId": "req_1692692147000_abc123def",
-  "timestamp": "2025-08-22T04:35:47.000Z",
-  "path": "/api/test/error/500"
+  "success": false,
+  "error": {
+    "message": "Error description",
+    "code": "ERROR_CODE", 
+    "statusCode": 400
+  }
 }
 ```
 
-### Error Response (Production)
-```json
-{
-  "status": "error",
-  "statusCode": 500,
-  "message": "Internal server error",
-  "requestId": "req_1692692147000_abc123def",
-  "timestamp": "2025-08-22T04:35:47.000Z",
-  "path": "/api/endpoint"
-}
+## Environment Configuration
+
+### Development
+```env
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=postgresql://user:pass@neon-db/cvision_dev
+FIREBASE_PROJECT_ID=cvision-dev
 ```
 
-## Installation
+### Production  
+```env
+NODE_ENV=production
+PORT=3000
+DATABASE_URL=postgresql://user:pass@neon-db/cvision_prod
+FIREBASE_PROJECT_ID=cvision-prod
+```
+
+## Installation & Setup
 
 ```bash
+# Install dependencies
 npm install
+
+# Set up environment
+cp .env.development.example .env.development
+# Configure Firebase credentials
+
+# Run database migration
+npx prisma migrate dev --name init
+
+# Start development server
+npm run start:dev
 ```
 
-## Running the app
+## Testing
+
+Postman collection included in `/postman/` directory:
+- Import `CVision-API.postman_collection.json`
+- Import environment files for dev/prod
+- Configure Firebase token in environment variables
+
+## Key Features
+
+## Project Structure
+
+```
+CVision/
+├── src/
+│   ├── auth/                # Firebase authentication
+│   ├── users/               # User management endpoints  
+│   ├── common/              # Shared decorators, filters, interceptors
+│   ├── prisma/              # Database service
+│   └── health/              # Health check endpoints
+├── prisma/
+│   └── schema.prisma        # Database schema
+├── postman/                 # API documentation & testing
+└── uploads/                 # Local file storage
+    ├── profileImages/       # User profile pictures
+    └── CVs/                 # CV documents
+```
+
+## Development
 
 ```bash
-# development mode
+# Start development server with hot reload
 npm run start:dev
 
-# debug mode  
-npm run start:debug
-
-# production mode (after build)
+# Build for production
 npm run build
-npm run start:prod
 
-# production mode with development config
-npm run start:prod:dev
+# Run production build
+npm run start:prod
 ```
+
+## Database
+
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Create and run migration
+npx prisma migrate dev --name migration_name
+
+# Reset database (dev only)
+npx prisma migrate reset
+```
+
+---
+
+**API Version**: MVP v1.0  
+**Framework**: Nest.js 10.x  
+**Node.js**: >= 18.x  
+**Database**: PostgreSQL with Prisma ORM
 
 ## Development
 

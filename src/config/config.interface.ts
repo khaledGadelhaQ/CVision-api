@@ -6,11 +6,14 @@ export interface AppConfig {
 }
 
 export interface DatabaseConfig {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
+  url: string;
+}
+
+export interface FirebaseConfig {
+  projectId: string;
+  clientEmail: string;
+  privateKey: string;
+  databaseURL: string;
 }
 
 export interface SecurityConfig {
@@ -21,6 +24,16 @@ export interface SecurityConfig {
 export interface ExternalServicesConfig {
   aiModelApiUrl: string;
   aiModelApiKey: string;
+  adzunaApiId?: string;
+  adzunaApiKey?: string;
+  joobleApiKey?: string;
+}
+
+export interface UploadConfig {
+  path: string;
+  maxFileSize: number;
+  allowedTypes: string[];
+  cloudStorageBucket?: string;
 }
 
 export interface LoggingConfig {
@@ -29,6 +42,10 @@ export interface LoggingConfig {
 }
 
 export interface PerformanceConfig {
-  rateLimitWindowMs?: number;
-  rateLimitMaxRequests?: number;
+  rateLimitWindowMs: number;
+  rateLimitMaxRequests: number;
+}
+
+export interface MonitoringConfig {
+  sentryDsn?: string;
 }

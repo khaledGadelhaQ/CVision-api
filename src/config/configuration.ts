@@ -6,11 +6,13 @@ export default () => ({
     apiVersion: process.env.API_VERSION || 'v1',
   },
   database: {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT, 10) || 5432,
-    username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || 'password',
-    database: process.env.DB_DATABASE || 'cvision',
+    url: process.env.DATABASE_URL || 'postgresql://localhost:5432/cvision_dev',
+  },
+  firebase: {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    databaseURL: process.env.FIREBASE_DATABASE_URL,
   },
   security: {
     jwtSecret: process.env.JWT_SECRET || 'default-secret',
@@ -19,6 +21,15 @@ export default () => ({
   externalServices: {
     aiModelApiUrl: process.env.AI_MODEL_API_URL || 'http://localhost:8000',
     aiModelApiKey: process.env.AI_MODEL_API_KEY || 'default-key',
+    adzunaApiId: process.env.ADZUNA_API_ID,
+    adzunaApiKey: process.env.ADZUNA_API_KEY,
+    joobleApiKey: process.env.JOOBLE_API_KEY,
+  },
+  upload: {
+    path: process.env.UPLOAD_PATH || './uploads',
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 10485760, // 10MB
+    allowedTypes: process.env.ALLOWED_FILE_TYPES?.split(',') || ['pdf', 'doc', 'docx'],
+    cloudStorageBucket: process.env.CLOUD_STORAGE_BUCKET,
   },
   logging: {
     logLevel: process.env.LOG_LEVEL || 'info',
@@ -27,5 +38,8 @@ export default () => ({
   performance: {
     rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 900000,
     rateLimitMaxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS, 10) || 100,
+  },
+  monitoring: {
+    sentryDsn: process.env.SENTRY_DSN,
   },
 });

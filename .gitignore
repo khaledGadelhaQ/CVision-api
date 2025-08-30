@@ -12,3 +12,5 @@ coverage/
 # Keep template environment files, but ignore local overrides
 !.env.development
 !.env.production
+
+/generated/prisma

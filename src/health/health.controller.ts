@@ -1,12 +1,21 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../prisma/prisma.service';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller('health')
+@Public()
 export class HealthController {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   @Get()
-  checkHealth() {
+  @Public()
+  async checkHealth() {
+    const dbHealth = await this.prismaService.isHealthy();
+    
     return {
       status: 'ok',
       service: 'CVision API',
@@ -14,16 +23,19 @@ export class HealthController {
       uptime: process.uptime(),
       environment: this.configService.get<string>('app.nodeEnv'),
       version: '1.0.0',
+      database: dbHealth ? 'connected' : 'disconnected',
     };
   }
 
   @Get('detailed')
-  checkDetailedHealth() {
+  @Public()
+  async checkDetailedHealth() {
     const nodeEnv = this.configService.get<string>('app.nodeEnv');
     const isDevelopment = nodeEnv === 'development';
+    const dbHealth = await this.prismaService.isHealthy();
 
     const baseInfo = {
-      status: 'ok',
+      status: dbHealth ? 'ok' : 'degraded',
       service: 'CVision API',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
@@ -31,14 +43,18 @@ export class HealthController {
       version: '1.0.0',
       services: {
         api: 'operational',
-        database: 'not_configured', // Update when database is added
-        aiService: 'not_configured', // Update when AI service is added
+        database: dbHealth ? 'operational' : 'down',
+        firebase: 'operational', // TODO: Add Firebase health check
+        aiService: 'not_configured', // TODO: Add AI service check
       },
       configuration: {
         port: this.configService.get<number>('app.port'),
         apiPrefix: this.configService.get<string>('app.apiPrefix'),
         apiVersion: this.configService.get<string>('app.apiVersion'),
         logLevel: this.configService.get<string>('logging.logLevel'),
+        databaseUrl: isDevelopment 
+          ? this.configService.get<string>('database.url')?.replace(/:[^:]*@/, ':***@')
+          : 'hidden',
       },
     };
 
@@ -58,8 +74,10 @@ export class HealthController {
           cpuUsage: process.cpuUsage(),
         },
         environment_variables: {
-          aiModelApiUrl: this.configService.get<string>('externalServices.aiModelApiUrl'),
-          enableRequestLogging: this.configService.get<boolean>('logging.enableRequestLogging'),
+          firebaseConfigured: !!this.configService.get<string>('firebase.projectId'),
+          uploadPath: this.configService.get<string>('upload.path'),
+          maxFileSize: this.configService.get<number>('upload.maxFileSize'),
+          allowedFileTypes: this.configService.get<string[]>('upload.allowedTypes'),
         },
       };
     }

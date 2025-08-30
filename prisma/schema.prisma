@@ -1,0 +1,171 @@
+// CVision Database Schema - MVP Version
+// AI-Powered Career Roadmap Application
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================
+// USER MANAGEMENT
+// ================================
+
+model User {
+  id               String   @id @default(cuid())
+  firebaseUid      String   @unique
+  email            String   @unique
+  
+  // Basic Profile Information
+  firstName        String?
+  lastName         String?
+  profileImage     String?  // Local file path to /uploads/profileImages/
+  
+  // Academic Information (simplified)
+  university       String?
+  major            String?
+  
+  // Career Information (simplified)
+  careerGoals      String?  // Simple text field
+  
+  // App Usage
+  onboardingCompleted Boolean @default(false)
+  
+  // Timestamps
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relations (simplified)
+  cvs              CV[]
+  skills           UserSkill[]
+  roadmaps         CareerRoadmap[]
+  
+  @@map("users")
+}
+
+// ================================
+// CV & DOCUMENT MANAGEMENT
+// ================================
+
+model CV {
+  id              String    @id @default(cuid())
+  userId          String
+  fileName        String
+  originalName    String
+  filePath        String    // Local file path to /uploads/CVs/
+  
+  // Processing Status (simplified)
+  isProcessed     Boolean   @default(false)
+  extractedText   String?   // Extracted text content
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("cvs")
+}
+
+// ================================
+// SKILLS MANAGEMENT
+// ================================
+
+model Skill {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  category        String    // e.g., "Technical", "Soft Skills", "Tools"
+  description     String?
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  
+  // Relations
+  userSkills      UserSkill[]
+  
+  @@map("skills")
+}
+
+model UserSkill {
+  id              String    @id @default(cuid())
+  userId          String
+  skillId         String
+  level           SkillLevel @default(BEGINNER)
+  isFromCV        Boolean   @default(false) // Was this skill extracted from CV?
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill           Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, skillId])
+  @@map("user_skills")
+}
+
+// ================================
+// CAREER ROADMAPS
+// ================================
+
+model CareerRoadmap {
+  id              String    @id @default(cuid())
+  userId          String
+  title           String
+  targetRole      String    // e.g., "Frontend Developer", "Data Scientist"
+  description     String?
+  status          RoadmapStatus @default(ACTIVE)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items           RoadmapItem[]
+  
+  @@map("career_roadmaps")
+}
+
+model RoadmapItem {
+  id              String    @id @default(cuid())
+  roadmapId       String
+  title           String
+  description     String?
+  category        String    // e.g., "Skill", "Project", "Course"
+  priority        Int       @default(1) // 1 = High, 2 = Medium, 3 = Low
+  estimatedHours  Int?      // Time estimation
+  isCompleted     Boolean   @default(false)
+  order           Int       // For ordering items in roadmap
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  roadmap         CareerRoadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  
+  @@map("roadmap_items")
+}
+
+// ================================
+// ENUMS
+// ================================
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum RoadmapStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
